@@ -20,10 +20,10 @@ class MachineDetailsEventHubConnected extends MachineEvent {
 
 class MachineDetailsEventDataUpDated extends MachineEvent {
   DateTime timestamp;
-  DeviceQuery deviceQuery;
+  NodeQuery nodeQuery;
   MachineDetailsEventDataUpDated(
       {required this.timestamp,
-      required this.deviceQuery,
+      required this.nodeQuery,
       });
   @override
   List<Object> get props => [timestamp];

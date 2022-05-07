@@ -184,10 +184,10 @@ class _MachineDetailsScreenState extends State<MachineDetailsScreen> {
                         text7: "Chế độ vận hành",
                         text8: "Số sản phẩm/lần ép",
                         data4: product.mold!.id.toString(),
-                        data5: product.mold!.standardInjectionCycle.toString(),
-                        data6: product.mold!.standardOpenTime.toString(),
+                        data5: devicequery.tagName[0].toString(),
+                        data6: devicequery.tagName[1].toString(),
                         data7: product.mold!.automatic.toString(),
-                        data8: product.mold!.productsPerShot.toString(),
+                        data8: devicequery.tagName[2].toString(),
                       ),
                     ),
                     SizedBox(height: SizeConfig.screenHeight * 0.0256),
@@ -214,7 +214,7 @@ class _MachineDetailsScreenState extends State<MachineDetailsScreen> {
                                 height: SizeConfig.screenHeight * 0.1230,
                                 decoration: BoxDecoration(
                                   color:
-                                      running ? Colors.green : Colors.black26,
+                                      bool.fromEnvironment(devicequery.tagName[4]) ? Colors.green : Colors.black26,
                                   shape: BoxShape.circle,
                                 ),
                               ),

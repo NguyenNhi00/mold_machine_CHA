@@ -76,7 +76,7 @@ class MachineDetailsBloc extends Bloc<MachineEvent, MachineDetailsState> {
       }
     } else if (event is MachineDetailsEventDataUpDated) {
       yield MachineDetailsStateDataUpdated(
-        deviceQuery:event.deviceQuery ,
+        nodeQuery:event.nodeQuery,
         timestamp: DateTime.now(),
       );
     }

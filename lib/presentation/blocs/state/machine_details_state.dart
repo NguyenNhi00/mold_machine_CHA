@@ -71,10 +71,10 @@ class MachineDetailsStateConnectFail extends MachineDetailsState {
 }
 
 class MachineDetailsStateDataUpdated extends MachineDetailsState {
-  DeviceQuery deviceQuery;
+  NodeQuery nodeQuery;
   DateTime timestamp;
   MachineDetailsStateDataUpdated({
-    required this.deviceQuery,
+    required this.nodeQuery,
     required this.timestamp,
   });
   @override
