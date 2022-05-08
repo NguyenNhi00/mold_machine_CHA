@@ -4,7 +4,6 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:injection_molding_machine_application/data/models/error_package.dart';
-import 'package:injection_molding_machine_application/domain/entities/configuration.dart';
 import 'package:injection_molding_machine_application/domain/entities/node_query.dart';
 import 'package:injection_molding_machine_application/presentation/blocs/bloc/machine_details_bloc.dart';
 import 'package:injection_molding_machine_application/presentation/blocs/event/machine_details_event.dart';
@@ -21,7 +20,7 @@ class _DeviceQueryResultViewState extends State<DeviceQueryResultView> {
   late HubConnection hubConnection;
   final List<DeviceQuery> connectedDeviceQuery = [];
   final List<DeviceQuery> disconnectedDeviceQuery = [];
-  List<DeviceQuery> deviceQuery = [];
+  List<DeviceQuery> deviceQueries = [];
   String deviceId = ''; // ma may
   String data1 = "null"; // ma san pham
   String data2 = "null"; // so luong ke hoach
@@ -81,14 +80,13 @@ class _DeviceQueryResultViewState extends State<DeviceQueryResultView> {
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
-        length: 3,
+        length: 2,
         child: Scaffold(
           appBar: AppBar(
             bottom: const TabBar(
               tabs: <Widget>[
                 Tab(text: "Tất cả"),
                 Tab(text: "Đang chạy"),
-                Tab(text: "Cảnh báo"),
               ],
             ),
             title: const Text('Quản lý máy ép'),
@@ -103,6 +101,91 @@ class _DeviceQueryResultViewState extends State<DeviceQueryResultView> {
               },
             ),
           ),
+          endDrawer: Drawer(
+          backgroundColor: Constants.secondaryColor,
+          child: Column(
+            children: [
+              Container(
+                width: SizeConfig.screenWidth * 0.7421,
+                height: SizeConfig.screenHeight * 0.4659,
+                decoration: const BoxDecoration(
+                    color: Constants.mainColor,
+                    borderRadius: BorderRadius.only(
+                        bottomLeft: Radius.circular(35.0),
+                        bottomRight: Radius.circular(35.0))),
+                child: Column(
+                  children: [
+                    SizedBox(
+                      height: SizeConfig.screenHeight * 0.0664,
+                    ),
+                    Icon(
+                      Icons.account_circle_rounded,
+                      size: SizeConfig.screenHeight * 0.2659,
+                      color: Colors.white,
+                    ),
+                    const Text(
+                      'Người Kiểm Tra:',
+                      style: TextStyle(fontSize: 23, color: Colors.white),
+                    ),
+                  ],
+                ),
+              ),
+              Column(
+                children: [
+                  Container(
+                    padding: EdgeInsets.only(
+                        left: SizeConfig.screenWidth * 0.0468,
+                        top: SizeConfig.screenHeight * 0.0797),
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.settings_outlined,
+                          size: SizeConfig.screenHeight * 0.0398,
+                          color: Colors.white,
+                        ),
+                        SizedBox(
+                          width: SizeConfig.screenWidth * 0.0156,
+                        ),
+                        const Text(
+                          'Cài Đặt',
+                          style: TextStyle(color: Colors.white, fontSize: 25),
+                        )
+                      ],
+                    ),
+                  ),
+                  SizedBox(
+                    height: SizeConfig.screenHeight * 0.0398,
+                  ),
+                  GestureDetector(
+                    child: Container(
+                      padding: EdgeInsets.only(
+                          left: SizeConfig.screenWidth * 0.0468),
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.logout,
+                            size: SizeConfig.screenHeight * 0.0398,
+                            color: Colors.white,
+                          ),
+                          SizedBox(
+                            width: SizeConfig.screenWidth * 0.0156,
+                          ),
+                          const Text(
+                            'Đăng Xuất',
+                            style: TextStyle(color: Colors.white, fontSize: 25),
+                          )
+                        ],
+                      ),
+                    ),
+                    onTap: () {
+                      Navigator.popAndPushNamed(context, '/');
+                    },
+                  )
+                ],
+              ),
+            ],
+          ),
+        ),
           body: BlocConsumer<MachineDetailsBloc, MachineDetailsState>(
               listener: (context, machineDetailsState) async {
             if (machineDetailsState is MachineDetailsStateConnectSuccessful) {
@@ -147,7 +230,7 @@ class _DeviceQueryResultViewState extends State<DeviceQueryResultView> {
                     itemBuilder: (context, index) {
                       return Column(
                         children: [
-                          Text(deviceQuery[index].deviceId.toString()),
+                          Text(deviceQueries[index].deviceId.toString()),
                           Expanded(
                             child: GestureDetector(
                               child: Image(
@@ -156,7 +239,7 @@ class _DeviceQueryResultViewState extends State<DeviceQueryResultView> {
                                 width: SizeConfig.screenWidth * 0.3650,
                               ),
                               onTap: () {
-                                Global.deviceQuery = deviceQuery[index];
+                                Global.deviceQuery = deviceQueries[index];
                                 Navigator.pushNamed(
                                     context, '/MachineDetailsScreen');
                                 Global.machineindex = index;
@@ -168,11 +251,11 @@ class _DeviceQueryResultViewState extends State<DeviceQueryResultView> {
                             children: [
                               Icon(
                                 bool.fromEnvironment(
-                                        deviceQuery[index].tagName[4])
+                                        deviceQueries[index].tagName[4])
                                     ? Icons.check_box_rounded
                                     : Icons.check_box_outline_blank_rounded,
                                 color: bool.fromEnvironment(
-                                        deviceQuery[index].tagName[4])
+                                        deviceQueries[index].tagName[4])
                                     ? Colors.green
                                     : Colors.red,
                                 size: 20,
@@ -180,13 +263,13 @@ class _DeviceQueryResultViewState extends State<DeviceQueryResultView> {
                               const SizedBox(width: 10),
                               Text(
                                 bool.fromEnvironment(
-                                        deviceQuery[index].tagName[4])
+                                        deviceQueries[index].tagName[4])
                                     ? "Đang kết nối"
                                     : "Ngắt kết nối",
                                 style: TextStyle(
                                     fontSize: 20,
                                     color: bool.fromEnvironment(
-                                            deviceQuery[index].tagName[4])
+                                            deviceQueries[index].tagName[4])
                                         ? Colors.green
                                         : Colors.red),
                               ),
@@ -217,6 +300,7 @@ class _DeviceQueryResultViewState extends State<DeviceQueryResultView> {
                                 width: SizeConfig.screenWidth * 0.3650,
                               ),
                               onTap: () {
+                                Global.deviceQuery = deviceQueries[index];
                                 Navigator.pushNamed(
                                     context, '/MachineDetailsScreen');
                                 Global.machineindex = index;
@@ -263,80 +347,10 @@ class _DeviceQueryResultViewState extends State<DeviceQueryResultView> {
                       );
                     },
                   ),
-                  // disconnet machines screen
-                  GridView.builder(
-                    padding: const EdgeInsets.all(10),
-                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisSpacing: SizeConfig.screenWidth * 0.0650,
-                      crossAxisCount: 2,
-                    ),
-                    itemCount: disconnectedDeviceQuery.length,
-                    itemBuilder: (context, index) {
-                      return Column(
-                        children: [
-                          Text(disconnectedDeviceQuery[index]
-                              .deviceId
-                              .toString()),
-                          Expanded(
-                            child: GestureDetector(
-                              child: Image(
-                                image:
-                                    const AssetImage('lib/assets/may_ep.jpg'),
-                                width: SizeConfig.screenWidth * 0.3650,
-                              ),
-                              onTap: () {
-                                Navigator.pushNamed(
-                                    context, '/MachineDetailsScreen');
-                                Global.machineindex = index;
-                              },
-                            ),
-                          ),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(
-                                bool.fromEnvironment(
-                                        disconnectedDeviceQuery[index]
-                                            .tagName[4]
-                                            .toString())
-                                    ? Icons.check_box_rounded
-                                    : Icons.check_box_outline_blank_rounded,
-                                color: bool.fromEnvironment(
-                                        disconnectedDeviceQuery[index]
-                                            .tagName[4]
-                                            .toString())
-                                    ? Colors.green
-                                    : Colors.red,
-                                size: 20,
-                              ),
-                              const SizedBox(width: 10),
-                              Text(
-                                bool.fromEnvironment(
-                                        disconnectedDeviceQuery[index]
-                                            .tagName[4]
-                                            .toString())
-                                    ? "Đang kết nối"
-                                    : "Ngắt kết nối",
-                                style: TextStyle(
-                                    fontSize: 20,
-                                    color: bool.fromEnvironment(
-                                            disconnectedDeviceQuery[index]
-                                                .tagName[4]
-                                                .toString())
-                                        ? Colors.green
-                                        : Colors.red),
-                              ),
-                              const SizedBox(width: 20),
-                            ],
-                          ),
-                        ],
-                      );
-                    },
-                  ),
                 ],
               );
             } else {
-              return CircularProgressIndicator();
+              return const Center(child: CircularProgressIndicator());
             }
           }),
         ));
@@ -344,24 +358,25 @@ class _DeviceQueryResultViewState extends State<DeviceQueryResultView> {
 
   // ham hung du lieu tu SignalR
   void machineDetailsHandlers(List<dynamic>? data) {
+    print('data get from server: ${data}');
     for (int i = 0; i < data!.length; i++) {
       Global.machineLengh = data.length;
-      Map<String, dynamic> tagName = {
-        deviceQuery[i].tagName[i][1]: data[i]['tagName']
+      Map<String,dynamic> tagName = {
+        deviceQueries[i].tagName[i][1]: data[i]['tagName']
             ['${data[i]['deviceId']}.CycleTime'],
-        deviceQuery[i].tagName[i][2]: data[i]['tagName']
+        deviceQueries[i].tagName[i][2]: data[i]['tagName']
             ['${data[i]['deviceId']}.CycleTime'],
-        deviceQuery[i].tagName[i][3]: data[i]['tagName']
+        deviceQueries[i].tagName[i][3]: data[i]['tagName']
             ['${data[i]['deviceId']}.CycleTime'],
-        deviceQuery[i].tagName[i][4]: data[i]['tagName']
+        deviceQueries[i].tagName[i][4]: data[i]['tagName']
             ['${data[i]['deviceId']}.CycleTime'],
-        deviceQuery[i].tagName[i][5]: data[i]['tagName']
+        deviceQueries[i].tagName[i][5]: data[i]['tagName']
             ['${data[i]['deviceId']}.CycleTime'],
       };
       Map<String, dynamic> deviceid = {
-        deviceQuery[i].deviceId: data[i]['deviceId'],
+        deviceQueries[i].deviceId[i]: data[i]['deviceId'],
       };
-      deviceQuery.add(DeviceQuery(deviceId: deviceid[i], tagName: tagName[i]));
+      deviceQueries.add(DeviceQuery(deviceId: deviceid[i], tagName: tagName[i]));
     }
     machineManagementdevided();
 
@@ -370,16 +385,16 @@ class _DeviceQueryResultViewState extends State<DeviceQueryResultView> {
         MachineDetailsEventDataUpDated(
             timestamp: DateTime.now(),
             nodeQuery: NodeQuery(
-                deviceQueries: deviceQuery,
+                deviceQueries: deviceQueries,
                 eonNodeId: Map<String, dynamic>.from(data[0])['eonNodeId'])));
   }
 
   void machineManagementdevided() {
-    for (int i = 0; i < deviceQuery.length; i++) {
-      if (bool.fromEnvironment(deviceQuery[i].tagName[i][4]) == true) {
-        connectedDeviceQuery.add(deviceQuery[i]);
+    for (int i = 0; i < deviceQueries.length; i++) {
+      if (bool.fromEnvironment(deviceQueries[i].tagName[i][4]) == true) {
+        connectedDeviceQuery.add(deviceQueries[i]);
       } else {
-        disconnectedDeviceQuery.add(deviceQuery[i]);
+        disconnectedDeviceQuery.add(deviceQueries[i]);
       }
     }
   }

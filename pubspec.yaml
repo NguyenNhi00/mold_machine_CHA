@@ -29,6 +29,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  web_socket_channel: ^2.2.0
   get_it: ^7.2.0
   rflutter_alert: ^2.0.4
   bloc: ^8.0.3

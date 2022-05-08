@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:core';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -9,6 +10,8 @@ import 'package:injection_molding_machine_application/presentation/blocs/state/m
 import 'package:injection_molding_machine_application/presentation/views/models/operating_params_reliability.dart';
 import 'package:injection_molding_machine_application/presentation/widgets/constant.dart';
 import 'package:injection_molding_machine_application/presentation/views/models/mold_params_reliability.dart';
+import 'package:web_socket_channel/web_socket_channel.dart';
+import 'package:web_socket_channel/status.dart' as status;
 import '../../data/models/error_package.dart';
 import '../blocs/bloc/machine_details_bloc.dart';
 import '../blocs/event/machine_details_event.dart';
@@ -20,12 +23,13 @@ class MachineDetailsScreen extends StatefulWidget {
   DeviceQuery devicequery;
   MachineDetailsScreen(this.devicequery);
   @override
-  _MachineDetailsScreenState createState() => _MachineDetailsScreenState(devicequery);
+  _MachineDetailsScreenState createState() =>
+      _MachineDetailsScreenState(devicequery);
 }
 
 class _MachineDetailsScreenState extends State<MachineDetailsScreen> {
-   DeviceQuery devicequery;
-   _MachineDetailsScreenState(this.devicequery);
+  DeviceQuery devicequery;
+  _MachineDetailsScreenState(this.devicequery);
   String data1 = "null";
   String data2 = "null";
   String data3 = "null";
@@ -36,13 +40,14 @@ class _MachineDetailsScreenState extends State<MachineDetailsScreen> {
   String data8 = "null";
   bool warning = false;
   bool running = false;
+  final _channel = WebSocketChannel.connect(Uri.parse(Constants.signalRUrl));
   late HubConnection hubConnection;
   List<Configuration> configuration = [];
   Product product = Product();
   @override
   void initState() {
     super.initState();
-   try {
+    try {
       hubConnection = HubConnectionBuilder()
           .withUrl(Constants.signalRUrl)
           .withAutomaticReconnect()
@@ -81,14 +86,14 @@ class _MachineDetailsScreenState extends State<MachineDetailsScreen> {
                   errorCode: "error",
                   message: "Lỗi xảy ra",
                   detail: e.toString())));
-   }
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     SizeConfig().init(context);
     return Scaffold(
-      appBar: AppBar(
+        appBar: AppBar(
           title: const Text('Thông số máy ép'),
           backgroundColor: Constants.mainColor,
           leading: IconButton(
@@ -101,10 +106,94 @@ class _MachineDetailsScreenState extends State<MachineDetailsScreen> {
             },
           ),
         ),
-      body: 
-        BlocConsumer<MachinesManagementBloc, MachineManagementState>(
+        endDrawer: Drawer(
+          backgroundColor: Constants.secondaryColor,
+          child: Column(
+            children: [
+              Container(
+                width: SizeConfig.screenWidth * 0.7421,
+                height: SizeConfig.screenHeight * 0.4659,
+                decoration: const BoxDecoration(
+                    color: Constants.mainColor,
+                    borderRadius: BorderRadius.only(
+                        bottomLeft: Radius.circular(35.0),
+                        bottomRight: Radius.circular(35.0))),
+                child: Column(
+                  children: [
+                    SizedBox(
+                      height: SizeConfig.screenHeight * 0.0664,
+                    ),
+                    Icon(
+                      Icons.account_circle_rounded,
+                      size: SizeConfig.screenHeight * 0.2659,
+                      color: Colors.white,
+                    ),
+                    const Text(
+                      'Người Kiểm Tra:',
+                      style: TextStyle(fontSize: 23, color: Colors.white),
+                    ),
+                  ],
+                ),
+              ),
+              Column(
+                children: [
+                  Container(
+                    padding: EdgeInsets.only(
+                        left: SizeConfig.screenWidth * 0.0468,
+                        top: SizeConfig.screenHeight * 0.0797),
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.settings_outlined,
+                          size: SizeConfig.screenHeight * 0.0398,
+                          color: Colors.white,
+                        ),
+                        SizedBox(
+                          width: SizeConfig.screenWidth * 0.0156,
+                        ),
+                        const Text(
+                          'Cài Đặt',
+                          style: TextStyle(color: Colors.white, fontSize: 25),
+                        )
+                      ],
+                    ),
+                  ),
+                  SizedBox(
+                    height: SizeConfig.screenHeight * 0.0398,
+                  ),
+                  GestureDetector(
+                    child: Container(
+                      padding: EdgeInsets.only(
+                          left: SizeConfig.screenWidth * 0.0468),
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.logout,
+                            size: SizeConfig.screenHeight * 0.0398,
+                            color: Colors.white,
+                          ),
+                          SizedBox(
+                            width: SizeConfig.screenWidth * 0.0156,
+                          ),
+                          const Text(
+                            'Đăng Xuất',
+                            style: TextStyle(color: Colors.white, fontSize: 25),
+                          )
+                        ],
+                      ),
+                    ),
+                    onTap: () {
+                      Navigator.popAndPushNamed(context, '/');
+                    },
+                  )
+                ],
+              ),
+            ],
+          ),
+        ),
+        body: BlocConsumer<MachinesManagementBloc, MachineManagementState>(
           listener: (context, MachineManagementState state) {
-             if (state is MachineManagementStateLoaded) {
+            if (state is MachineManagementStateLoaded) {
               product = state.product;
               print('information: $product');
             }
@@ -135,7 +224,14 @@ class _MachineDetailsScreenState extends State<MachineDetailsScreen> {
                               fontSize: 15,
                               width: SizeConfig.screenWidth * 0.3121,
                               height: SizeConfig.screenHeight * 0.07121,
-                              onPressed: () {}),
+                              onPressed: () {
+                                bool disconnectMachine = bool.fromEnvironment(
+                                        devicequery.tagName[4]) ==
+                                    false;
+                                _channel.sink.add(
+                                    "Tạm dừng máy ${devicequery.deviceId}");
+                                _channel.sink.close(status.goingAway);
+                              }),
                         ),
                         Container(
                           margin: const EdgeInsets.only(
@@ -146,7 +242,13 @@ class _MachineDetailsScreenState extends State<MachineDetailsScreen> {
                               fontSize: 15,
                               width: SizeConfig.screenWidth * 0.3121,
                               height: SizeConfig.screenHeight * 0.07121,
-                              onPressed: () {}),
+                              onPressed: () {
+                                bool connectMachine = bool.fromEnvironment(
+                                        devicequery.tagName[4]) ==
+                                    true;
+                                _channel.sink.add(connectMachine);
+                                _channel.sink.close(status.goingAway);
+                              }),
                         )
                       ],
                     ),
@@ -213,8 +315,10 @@ class _MachineDetailsScreenState extends State<MachineDetailsScreen> {
                                 width: SizeConfig.screenHeight * 0.1230,
                                 height: SizeConfig.screenHeight * 0.1230,
                                 decoration: BoxDecoration(
-                                  color:
-                                      bool.fromEnvironment(devicequery.tagName[4]) ? Colors.green : Colors.black26,
+                                  color: bool.fromEnvironment(
+                                          devicequery.tagName[4])
+                                      ? Colors.green
+                                      : Colors.black26,
                                   shape: BoxShape.circle,
                                 ),
                               ),
@@ -249,37 +353,8 @@ class _MachineDetailsScreenState extends State<MachineDetailsScreen> {
               ),
             );
           },
-        )
-        );
+        ));
   }
 
-  void machineDetailsHandlers(List<dynamic>? data) {
-    // print(Map<String, dynamic>.from(data![0])["alarm"]);
-    // BlocProvider.of<MachineDetailsBloc>(context)
-    //     .add(MachineDetailsEventDataUpDated(
-    //         configuration: configuration,
-    //         //bo dai cho dui @@ qua mit mui
-    //         moldMonitor: MoldMonitor(
-    //           alarm: Map<String, dynamic>.from(data[0])[" moldMonitor"],
-    //           maSanPham: Map<String, dynamic>.from(data[0])["maSanPham"],
-    //           running: Map<String, dynamic>.from(data[0])[" running"],
-    //           soLuongKeHoach:
-    //               Map<String, dynamic>.from(data[0])["soLuongKeHoach"],
-    //           soLuongThucTe:
-    //               Map<String, dynamic>.from(data[0])["soLuongThucTe"],
-    //         ),
-    //         timestamp: DateTime.now(),
-    //         mold: Mold(
-    //           automatic: Map<String, dynamic>.from(data[0])[" automatic"],
-    //           id: Map<String, dynamic>.from(data[0])[" id"],
-    //           standardInjectionCycle:
-    //               Map<String, dynamic>.from(data[0])[" standardInjectionCycle"],
-    //           standardOpenTime:
-    //               Map<String, dynamic>.from(data[0])["standardOpenTime"],
-    //           productsPerShot:
-    //               Map<String, dynamic>.from(data[0])["productsPerShot"],
-    //           injectionCycleTolerance:
-    //               Map<String, dynamic>.from(data[0])["injectionCycleTolerance"],
-    //         )));
-  }
+  void machineDetailsHandlers(List<dynamic>? data) {}
 }

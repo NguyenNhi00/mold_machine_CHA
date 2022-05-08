@@ -8,7 +8,6 @@ import 'package:injection_molding_machine_application/presentation/blocs/bloc/lo
 import 'package:injection_molding_machine_application/presentation/blocs/bloc/machine_details_bloc.dart';
 import 'package:injection_molding_machine_application/presentation/blocs/bloc/machine_management_bloc.dart';
 import 'package:injection_molding_machine_application/presentation/blocs/bloc/mold_parameter_bloc.dart';
-import 'package:signalr_core/signalr_core.dart';
 import 'data/repositories/login_repository_impl.dart';
 import 'data/repositories/machine_repository_impl.dart';
 import 'data/repositories/modify_machine_status_repo_impl.dart';

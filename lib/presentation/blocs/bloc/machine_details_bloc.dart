@@ -55,21 +55,21 @@ class MachineDetailsBloc extends Bloc<MachineEvent, MachineDetailsState> {
                 message: "Ngắt kết nối",
                 detail: "Đã ngắt kết nối tới máy chủ"));
       } else if (event.hubConnection.state == HubConnectionState.connected) {
-        MoldMonitorModel moldMonitorModel = MoldMonitorModel(
-          alarm: false,
-          running: false,
-          maSanPham: "M25",
-          soLuongKeHoach: 0,
-          soLuongThucTe: 0,
-        );
-        MoldModel moldModel = const MoldModel(
-          id: "1234",
-          standardInjectionCycle: 10,
-          standardOpenTime: 10,
-          injectionCycleTolerance: 5,
-          automatic: true,
-          productsPerShot: 0,
-        );
+        // MoldMonitorModel moldMonitorModel = MoldMonitorModel(
+        //   alarm: false,
+        //   running: false,
+        //   maSanPham: "M25",
+        //   soLuongKeHoach: 0,
+        //   soLuongThucTe: 0,
+        // );
+        // MoldModel moldModel = const MoldModel(
+        //   id: "1234",
+        //   standardInjectionCycle: 10,
+        //   standardOpenTime: 10,
+        //   injectionCycleTolerance: 5,
+        //   automatic: true,
+        //   productsPerShot: 0,
+        // );
         yield MachineDetailsStateConnectSuccessful(
          
         );
